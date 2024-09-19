@@ -6,9 +6,24 @@
     <div class="bg-green-600 text-white text-center py-16">
         <h1 class="text-5xl font-bold mb-4">Welcome to Recipeze</h1>
         <p class="text-xl mb-8">The easiest way to find recipes based on the ingredients you have at home!</p>
-        <a href="{{ route('recipes.generate') }}" class="bg-white text-green-600 font-semibold py-3 px-8 rounded-lg shadow hover:bg-gray-200 transition duration-300">
-            Get Started
-        </a>
+
+        <div class="mt-12">
+            <div class="relative">
+                <a href="{{ route('recipes.generate') }}"
+                   class="generate-button bg-white text-green-600 font-semibold py-3 px-8 rounded-full shadow hover:bg-gray-200 transition duration-300">
+                    Generate Your Recipes Now
+                </a>
+
+                <div class="stars">
+                    <span class="star"></span>
+                    <span class="star"></span>
+                    <span class="star"></span>
+                    <span class="star"></span>
+                    <span class="star"></span>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <section class="py-16 bg-white">
@@ -42,3 +57,46 @@
         </a>
     </section>
 @endsection
+
+<style>
+    .generate-button {
+        position: relative;
+        z-index: 10;
+    }
+
+    .stars {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 200px;
+        height: 200px;
+        z-index: 1;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    .star {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background-color: white;
+        border-radius: 50%;
+        animation: rotate 3s linear infinite;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .star:nth-child(1) { top: 0; left: 50%; animation-delay: 0s; }
+    .star:nth-child(2) { top: 25%; left: 90%; animation-delay: 0.4s; }
+    .star:nth-child(3) { top: 75%; left: 90%; animation-delay: 0.8s; }
+    .star:nth-child(4) { top: 90%; left: 50%; animation-delay: 1.2s; }
+    .star:nth-child(5) { top: 75%; left: 10%; animation-delay: 1.6s; }
+
+    @keyframes rotate {
+        0% {
+            transform: rotate(0deg) translateX(80px);
+        }
+        100% {
+            transform: rotate(360deg) translateX(80px);
+        }
+    }
+</style>

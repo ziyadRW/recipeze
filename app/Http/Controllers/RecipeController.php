@@ -29,7 +29,7 @@ class RecipeController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('generate', compact('paginatedRecipes', 'ingredient'));
+        return view('recipes.generate', compact('paginatedRecipes', 'ingredient'));
     }
 
     public function showRecipe($id)

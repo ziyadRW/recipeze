@@ -34,7 +34,7 @@
             </div>
 
             <div class="mt-8 flex justify-center">
-                {{ $paginatedRecipes->appends(request()->query())->links('vendor.pagination.custom') }}
+                {{ $paginatedRecipes->appends(request()->query())->links('partials.pagination.custom') }}
             </div>
 
         @else
