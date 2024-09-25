@@ -132,7 +132,7 @@
 </main>
 
 <footer class="bg-gray-800 text-white text-center py-8 mt-auto">
-    <p>&copy; 2024 Recipeze. Developed by Recipeze team supervised by Dr. Sultan. All Rights Reserved.</p>
+    <p>&copy; 2024 Recipeze. Developed by Saud Albarkheel and Ziyad Alruwaished for SWE481 supervised by Dr. Al-Wadud. All Rights Reserved.</p>
 </footer>
 
 </body>
