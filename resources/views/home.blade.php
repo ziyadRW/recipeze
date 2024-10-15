@@ -9,7 +9,7 @@
 
         <div class="mt-12">
             <div class="relative">
-                <a href="{{ route('recipes.generate') }}"
+                <a href="{{ route('recipes.list') }}"
                    class="generate-button bg-white text-green-600 font-semibold py-3 px-8 rounded-full shadow hover:bg-gray-200 transition duration-300">
                     Generate Your Recipes Now
                 </a>
@@ -52,7 +52,7 @@
     <section class="bg-green-600 text-white text-center py-16">
         <h2 class="text-4xl font-bold mb-4">Ready to Start Cooking?</h2>
         <p class="text-lg mb-8">Discover new recipes and make meal planning easy with Recipeze.</p>
-        <a href="{{ route('recipes.generate') }}" class="bg-white text-green-600 font-semibold py-3 px-8 rounded-lg shadow hover:bg-gray-200 transition duration-300">
+        <a href="{{ route('recipes.list') }}" class="bg-white text-green-600 font-semibold py-3 px-8 rounded-lg shadow hover:bg-gray-200 transition duration-300">
             Get Started Now
         </a>
     </section>

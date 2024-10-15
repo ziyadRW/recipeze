@@ -3,64 +3,68 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Recipe;
+use App\Models\Ingredient;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Http;
 
 class RecipeController extends Controller
 {
-    public function generateRecipes(Request $request)
+    public function listRecipes(Request $request)
     {
         $ingredientInput = $request->query('ingredient', '');
         $hasVideo = $request->has('has_video');
         $page = $request->input('page', 1);
         $perPage = 9;
-        $from = ($page - 1) * $perPage;
 
-        $allRecipes = [];
         $ingredients = $ingredientInput ? array_map('trim', explode(',', $ingredientInput)) : [];
 
-        $response = Http::withHeaders([
-            'x-rapidapi-key' => 'f830be2131msha99f2ca579e19d6p1c9d74jsnb821589347cd',
-            'x-rapidapi-host' => 'tasty.p.rapidapi.com'
-        ])->withOptions([
-            'verify' => false
-        ])->get('https://tasty.p.rapidapi.com/recipes/list', [
-            'from' => $from,
-            'size' => $perPage,
-            'q' => implode(',', $ingredients)
-        ]);
+        $query = Recipe::with('ingredients');
 
-        $recipes = $response->json()['results'] ?? [];
-        $totalResults = $response->json()['count'] ?? 0;
-
-        if ($hasVideo) {
-            $recipes = array_filter($recipes, function ($recipe) {
-                return isset($recipe['original_video_url']) && !empty($recipe['original_video_url']);
+        if (!empty($ingredients)) {
+            $query->whereHas('ingredients', function($q) use ($ingredients) {
+                $q->whereIn('name', $ingredients);
             });
         }
-        $paginatedRecipes = new LengthAwarePaginator(
-            $recipes,
-            $totalResults,
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
 
-        return view('recipes.generate', compact('paginatedRecipes', 'ingredientInput'));
+        if ($hasVideo) {
+            $query->whereNotNull('original_video_url');
+        }
+
+        $recipes = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return view('recipes.list', [
+            'paginatedRecipes' => $recipes,
+            'ingredientInput' => $ingredientInput,
+        ]);
     }
+
     public function showRecipe($id)
     {
-        $response = Http::withHeaders([
-            'x-rapidapi-key' => 'f830be2131msha99f2ca579e19d6p1c9d74jsnb821589347cd',
-            'x-rapidapi-host' => 'tasty.p.rapidapi.com'
-        ])->withOptions([
-            'verify' => false
-        ])->get('https://tasty.p.rapidapi.com/recipes/get-more-info', [
-            'id' => $id
-        ]);
-
-        $recipe = $response->json();
+        $recipe = Recipe::with('ingredients')->findOrFail($id);
 
         return view('recipes.show', compact('recipe'));
+    }
+
+    public function toggleBookmarkRecipe($id)
+    {
+        $recipe = Recipe::find($id);
+
+        if($recipe){
+            if(!$recipe->saved){
+                $recipe->saved= true;
+                $recipe->save();
+                return back()->with('successToaster', 'Recipe added to saved Recipes');
+            }
+            $recipe->saved= false;
+            $recipe->save();
+            return back()->with('infoToaster', 'Recipe removed from saved Recipes');
+        }
+        return back()->with('errorToaster', 'Failed to bookmark Recipe');
+    }
+
+    public function listSavedRecipes()
+    {
+        $savedRecipes = Recipe::where('saved', true)->paginate(9);
+        return view('recipes.saved', compact('savedRecipes'));
     }
 }

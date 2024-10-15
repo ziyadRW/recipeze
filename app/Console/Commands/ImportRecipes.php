@@ -8,7 +8,7 @@ use JsonMachine\Items;
 
 class ImportRecipes extends Command
 {
-    protected $signature = 'import:recipes {file}';
+    protected $signature = 'import:recipes /home/ziyad-alruwaished/Documents/all_recipes5.json';
     protected $description = 'Import recipes from a JSON file';
 
     public function handle()

@@ -67,7 +67,7 @@
         <ul class="hidden md:flex space-x-6 relative">
             <li><a href="{{ route('home') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
             <li><a href="{{ route('kitchen.index') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('kitchen.index') ? 'active' : '' }}">My Kitchen</a></li>
-            <li><a href="{{ route('saved-recipes.index') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('saved-recipes.index') ? 'active' : '' }}">Saved Recipes</a></li>
+            <li><a href="{{ route('recipes.saved') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('recipes.saved') ? 'active' : '' }}">Saved Recipes</a></li>
 
             <div class="nav-underline"></div>
         </ul>
@@ -105,7 +105,7 @@
         <ul class="space-y-4 p-4">
             <li><a href="{{ route('home') }}" class="block text-white hover:text-gray-300">Home</a></li>
             <li><a href="{{ route('kitchen.index') }}" class="block text-white hover:text-gray-300">My Kitchen</a></li>
-            <li><a href="{{ route('saved-recipes.index') }}" class="block text-white hover:text-gray-300">Saved Recipes</a></li>
+            <li><a href="{{ route('recipes.saved') }}" class="block text-white hover:text-gray-300">Saved Recipes</a></li>
 
             @auth
                 <li><a href="{{ route('profile.show') }}" class="block text-white hover:text-gray-300">

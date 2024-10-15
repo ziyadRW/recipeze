@@ -6,7 +6,7 @@
     <div class="container mx-auto py-12">
         <h1 class="text-3xl font-bold text-center mb-8">Recipes Based on Your Ingredients</h1>
 
-        <form method="GET" action="{{ route('recipes.generate') }}" class="mb-8 text-center">
+        <form method="GET" action="{{ route('recipes.list') }}" class="mb-8 text-center">
             <div class="relative inline-block w-full max-w-lg">
                 <input type="text" name="ingredient" placeholder="Enter ingredients (comma separated)"
                        value="{{ $ingredientInput }}"
@@ -28,46 +28,43 @@
                     </label>
                 </div>
             @endif
-
         </form>
-
-
-
 
         @if($ingredientInput)
             @if($paginatedRecipes->count())
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     @foreach($paginatedRecipes as $recipe)
-                        <a href="{{ route('recipes.show', $recipe['id']) }}" class="bg-white shadow-md rounded-lg p-4 text-center transition duration-300 transform hover:scale-105 hover:shadow-xl block group">
-                            <img src="{{ $recipe['thumbnail_url'] }}" alt="{{ $recipe['name'] }}" class="w-full h-48 object-cover mb-4 rounded group-hover:opacity-90">
+                        <a href="{{ route('recipes.show', $recipe->id) }}" class="bg-white shadow-md rounded-lg p-4 text-center transition duration-300 transform hover:scale-105 hover:shadow-xl block group">
+                            <img src="{{ $recipe->thumbnail_url }}" alt="{{ $recipe->name }}" class="w-full h-48 object-cover mb-4 rounded group-hover:opacity-90">
 
                             <div class="flex flex-col justify-between items-center">
                                 <h2 class="text-xl font-semibold mb-2 text-gray-800 text-center group-hover:text-green-600">
-                                    @if(isset($recipe['original_video_url']) && !empty($recipe['original_video_url']))
+                                    @if($recipe->original_video_url)
                                         <i class="fas fa-video text-red-500 mr-2"></i>
                                     @endif
-                                    {{ $recipe['name'] }}
+                                    {{ $recipe->name }}
                                 </h2>
 
                                 <div class="flex justify-between items-center w-full mt-2">
                                     <div>
-                                        @if(isset($recipe['nutrition']['calories']))
+                                        @if($recipe->calories)
                                             <p class="text-sm text-gray-500 flex items-center">
-                                                <i class="fas fa-fire-alt mr-2"></i> {{ $recipe['nutrition']['calories'] }} Calories
+                                                <i class="fas fa-fire-alt mr-2"></i> {{ $recipe->calories }} Calories
                                             </p>
                                         @endif
                                         <p class="text-sm text-gray-500 flex items-center">
                                             <i class="fas fa-clock mr-2"></i>
-                                            {{ $recipe['cook_time_minutes'] ? $recipe['cook_time_minutes'].' minutes' : 'Unknown' }}
+                                            {{ $recipe->cook_time_minutes ? $recipe->cook_time_minutes.' minutes' : 'Unknown' }}
                                         </p>
                                     </div>
 
-                                    <form method="POST" action="{{ route('recipes.bookmark', $recipe['id']) }}">
+                                    <form method="POST" action="{{ route('recipes.bookmark', $recipe->id) }}">
                                         @csrf
-                                        <button class="text-gray-400 hover:text-red-500 transition duration-300" aria-label="Bookmark">
-                                            <i class="fas fa-bookmark"></i>
+                                        <button class="{{ $recipe->saved ? 'text-red-500 hover:text-gray-500' : 'text-gray-400 hover:text-red-500' }} transition duration-300" aria-label="Bookmark">
+                                            <i class="{{ $recipe->saved ? 'fas fa-bookmark' : 'far fa-bookmark' }}"></i>
                                         </button>
                                     </form>
+
                                 </div>
                             </div>
                         </a>
