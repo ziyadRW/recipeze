@@ -40,7 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
             'redirectTo' => 'login',
-            ]
+            ],
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ]
     ],
 
     /*

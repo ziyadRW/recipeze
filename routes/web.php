@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('recipeze')->group(function() {
 
     // Home page
+    Route::get('/list', [RecipeController::class, 'index'])->name('recipes.index');
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     // Authentication guest routes

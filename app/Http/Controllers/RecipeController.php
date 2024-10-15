@@ -9,6 +9,17 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class RecipeController extends Controller
 {
+    public function index(Request $request){
+        $savedRecipes = Recipe::paginate(10);
+        if ($request->is('api/*')) {
+            return response()->json([
+                'recipes' => $savedRecipes
+            ]);
+        } else {
+            return view('recipes.saved', compact('savedRecipes'));
+        }
+    }
+
     public function listRecipes(Request $request)
     {
         $ingredientInput = $request->query('ingredient', '');
