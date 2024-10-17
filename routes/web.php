@@ -24,8 +24,6 @@ Route::prefix('recipeze')->group(function() {
         Route::prefix('kitchen')->group(function() {
             Route::get('/', [KitchenController::class, 'index'])->name('kitchen.index');
             Route::post('/ingredient/toggle/{id}', [KitchenController::class, 'toggleIngredientAvailability'])->name('kitchen.ingredient.toggle');
-            Route::post('/ingredient/add', [KitchenController::class, 'addIngredient'])->name('kitchen.ingredient.add');
-            Route::post('/category/add', [KitchenController::class, 'addCategory'])->name('kitchen.category.add');
         });
 
         // profile routes

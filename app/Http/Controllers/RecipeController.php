@@ -26,6 +26,8 @@ class RecipeController extends Controller
         $hasVideo = $request->has('has_video');
         $page = $request->input('page', 1);
         $perPage = 9;
+        $user = auth()->user();
+        $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
 
         $ingredients = $ingredientInput ? array_map('trim', explode(',', $ingredientInput)) : [];
 
@@ -46,36 +48,46 @@ class RecipeController extends Controller
         return view('recipes.list', [
             'paginatedRecipes' => $recipes,
             'ingredientInput' => $ingredientInput,
+            'savedRecipeIds' => $savedRecipeIds
         ]);
     }
 
     public function showRecipe($id)
     {
         $recipe = Recipe::with('ingredients')->findOrFail($id);
-
-        return view('recipes.show', compact('recipe'));
+        $user = auth()->user();
+        $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
+        return view('recipes.show', [
+            'recipe' => $recipe,
+            'savedRecipeIds' => $savedRecipeIds
+        ]);
     }
 
     public function toggleBookmarkRecipe($id)
     {
-        $recipe = Recipe::find($id);
+        $recipe = Recipe::findOrFail($id);
+        $user = auth()->user();
 
-        if($recipe){
-            if(!$recipe->saved){
-                $recipe->saved= true;
-                $recipe->save();
-                return back()->with('successToaster', 'Recipe added to saved Recipes');
-            }
-            $recipe->saved= false;
-            $recipe->save();
-            return back()->with('infoToaster', 'Recipe removed from saved Recipes');
+        if ($user->savedRecipes()->where('recipe_id', $id)->exists()) {
+            $user->savedRecipes()->detach($id);
+            return back()->with('infoToaster','Recipe removed from saved recipes');
+        } else {
+            $user->savedRecipes()->attach($id);
+            return back()->with('successToaster', 'Recipe saved successfully');
         }
         return back()->with('errorToaster', 'Failed to bookmark Recipe');
     }
 
     public function listSavedRecipes()
     {
-        $savedRecipes = Recipe::where('saved', true)->paginate(9);
-        return view('recipes.saved', compact('savedRecipes'));
+        $user = auth()->user();
+        $savedRecipes = $user->savedRecipes()->paginate(10);
+        $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
+
+        return view('recipes.saved', [
+            'savedRecipes' => $savedRecipes,
+            'savedRecipeIds' => $savedRecipeIds
+        ]);
     }
+
 }

@@ -60,8 +60,8 @@
 
                                     <form method="POST" action="{{ route('recipes.bookmark', $recipe->id) }}">
                                         @csrf
-                                        <button class="{{ $recipe->saved ? 'text-red-500 hover:text-gray-500' : 'text-gray-400 hover:text-red-500' }} transition duration-300" aria-label="Bookmark">
-                                            <i class="{{ $recipe->saved ? 'fas fa-bookmark' : 'far fa-bookmark' }}"></i>
+                                        <button class="{{ in_array($recipe->id, $savedRecipeIds) ? 'text-red-500 hover:text-gray-500' : 'text-gray-400 hover:text-red-500' }} transition duration-300" aria-label="Bookmark">
+                                            <i class="{{ in_array($recipe->id, $savedRecipeIds) ? 'fas fa-bookmark' : 'far fa-bookmark' }}"></i>
                                         </button>
                                     </form>
 
