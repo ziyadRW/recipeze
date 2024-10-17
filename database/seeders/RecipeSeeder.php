@@ -6,6 +6,7 @@ use App\Models\Recipe;
 use App\Models\Ingredient;
 use Illuminate\Database\Seeder;
 use JsonMachine\Items;
+use Illuminate\Support\Facades\Http;
 
 class RecipeSeeder extends Seeder
 {
@@ -17,7 +18,24 @@ class RecipeSeeder extends Seeder
     public function run()
     {
         ini_set('memory_limit', '-1');
+
+        // Google Drive file download link
+        $googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1HdycJGGpm2RITO4MHLkyuDxeCfYxGkjF';
         $filePath = database_path('seeders/all_recipes.json');
+
+        // Check if the file already exists locally, if not, download it
+        if (!file_exists($filePath)) {
+            $this->command->info('Downloading the recipes JSON file from Google Drive...');
+            $response = Http::get($googleDriveUrl);
+
+            if ($response->ok()) {
+                file_put_contents($filePath, $response->body());
+                $this->command->info('File downloaded and saved locally.');
+            } else {
+                $this->command->error('Failed to download the file from Google Drive.');
+                return;
+            }
+        }
 
         if (!file_exists($filePath) || !is_readable($filePath)) {
             $this->command->error('File does not exist or is not readable.');
