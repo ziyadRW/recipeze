@@ -53,9 +53,10 @@
 
         <div class="flex items-center mt-8">
 
-            <a href="{{ route('recipes.list') }}" class="bg-green-600 text-white py-2 px-4 rounded-lg shadow hover:bg-green-700 transition duration-300 inline-flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Recipes
+            <a href="javascript:history.back()" class="bg-green-600 text-white py-2 px-4 rounded-lg shadow hover:bg-green-700 transition duration-300 inline-flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Back
             </a>
+
 
 
             <form method="POST" action="{{ route('recipes.bookmark', $recipe->id) }}" class="ml-4">

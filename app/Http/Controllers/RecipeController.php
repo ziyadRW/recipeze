@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Ingredient;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 
 class RecipeController extends Controller
 {
@@ -22,33 +23,68 @@ class RecipeController extends Controller
 
     public function listRecipes(Request $request)
     {
-        $ingredientInput = $request->query('ingredient', '');
+        $searchTerm = $request->input('search', '');
         $hasVideo = $request->has('has_video');
-        $page = $request->input('page', 1);
         $perPage = 9;
+
         $user = auth()->user();
         $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
 
-        $ingredients = $ingredientInput ? array_map('trim', explode(',', $ingredientInput)) : [];
+        $query = Recipe::query();
 
-        $query = Recipe::with('ingredients');
-
-        if (!empty($ingredients)) {
-            $query->whereHas('ingredients', function($q) use ($ingredients) {
-                $q->whereIn('name', $ingredients);
-            });
+        if (!empty($searchTerm)) {
+            $query->where('name', 'like', '%' . $searchTerm . '%');
         }
 
         if ($hasVideo) {
             $query->whereNotNull('original_video_url');
         }
-
-        $recipes = $query->paginate($perPage, ['*'], 'page', $page);
+        $recipes = $query->paginate($perPage);
 
         return view('recipes.list', [
             'paginatedRecipes' => $recipes,
-            'ingredientInput' => $ingredientInput,
-            'savedRecipeIds' => $savedRecipeIds
+            'searchTerm' => $searchTerm,
+            'hasVideo' => $hasVideo,
+            'savedRecipeIds' => $savedRecipeIds,
+        ]);
+    }
+
+
+
+    public function generatedRecipes(Request $request)
+    {
+        $user = auth()->user();
+        $perPage = 9;
+        $page = $request->input('page', 1);
+        $userIngredients = $user->ingredients->pluck('name')->toArray();
+        $recipes = Recipe::with('ingredients')
+            ->whereHas('ingredients', function ($query) use ($userIngredients) {
+                $query->whereIn('name', $userIngredients);
+            })
+            ->get()
+            ->map(function ($recipe) use ($userIngredients) {
+                $recipeIngredients = $recipe->ingredients->pluck('name')->toArray();
+                $missingIngredients = array_diff($recipeIngredients, $userIngredients);
+                $recipe->missing_count = count($missingIngredients);
+                $recipe->missing_ingredients = $missingIngredients;
+                $recipe->full_ingredients = empty($missingIngredients);
+                return $recipe;
+            });
+        $sortedRecipes = $recipes->sortBy(function ($recipe) {
+            return [$recipe->missing_count, $recipe->name];
+        })->values();
+        $paginatedRecipes = new LengthAwarePaginator(
+            $sortedRecipes->forPage($page, $perPage),
+            $sortedRecipes->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+        $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
+
+        return view('recipes.generated', [
+            'paginatedRecipes' => $paginatedRecipes,
+            'savedRecipeIds' => $savedRecipeIds,
         ]);
     }
 

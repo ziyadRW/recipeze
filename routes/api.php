@@ -37,6 +37,7 @@ Route::prefix('v1/recipeze')->group(function() {
         Route::prefix('recipes')->group(function() {
             Route::get('/saved', [RecipeController::class, 'listSavedRecipes'])->name('api.v1.recipes.saved');
             Route::get('/list', [RecipeController::class, 'listRecipes'])->name('api.v1.recipes.list');
+            Route::get('/generated', [RecipeController::class, 'generatedRecipes'])->name('api.v1.recipes.generated');
             Route::post('/bookmark/{id}', [RecipeController::class, 'toggleBookmarkRecipe'])->name('api.v1.recipes.bookmark');
             Route::get('/{id}', [RecipeController::class, 'showRecipe'])->name('api.v1.recipes.show');
         });

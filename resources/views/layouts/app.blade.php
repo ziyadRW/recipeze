@@ -55,6 +55,7 @@
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
+
     </script>
 </head>
 <body class="bg-white text-gray-800 flex flex-col min-h-screen">
@@ -66,6 +67,7 @@
 
         <ul class="hidden md:flex space-x-6 relative">
             <li><a href="{{ route('home') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
+            <li><a href="{{ route('recipes.list') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('recipes.list') ? 'active' : '' }}">Browse</a></li>
             <li><a href="{{ route('kitchen.index') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('kitchen.index') ? 'active' : '' }}">My Kitchen</a></li>
             <li><a href="{{ route('recipes.saved') }}" class="nav-link text-white hover:text-gray-300 {{ request()->routeIs('recipes.saved') ? 'active' : '' }}">Saved Recipes</a></li>
 
@@ -104,6 +106,7 @@
     <div id="mobile-menu" class="md:hidden hidden">
         <ul class="space-y-4 p-4">
             <li><a href="{{ route('home') }}" class="block text-white hover:text-gray-300">Home</a></li>
+            <li><a href="{{ route('recipes.list') }}" class="block text-white hover:text-gray-300">Browse</a></li>
             <li><a href="{{ route('kitchen.index') }}" class="block text-white hover:text-gray-300">My Kitchen</a></li>
             <li><a href="{{ route('recipes.saved') }}" class="block text-white hover:text-gray-300">Saved Recipes</a></li>
 
