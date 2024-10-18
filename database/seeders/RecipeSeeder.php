@@ -19,25 +19,33 @@ class RecipeSeeder extends Seeder
     {
         ini_set('memory_limit', '-1');
 
-        // Google Drive file download link
-        $googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1HdycJGGpm2RITO4MHLkyuDxeCfYxGkjF';
-        $filePath = database_path('seeders/all_recipes.json');
+        // S3 file URL
+        $s3Url = 'https://recipeze.s3.eu-north-1.amazonaws.com/all_recipes4.json';
+        $localFilePath = database_path('seeders/all_recipes4.json');
 
-        // Check if the file already exists locally, if not, download it
-        if (!file_exists($filePath)) {
-            $this->command->info('Downloading the recipes JSON file from Google Drive...');
-            $response = Http::get($googleDriveUrl);
+        // Download the file locally if it does not exist
+        if (!file_exists($localFilePath)) {
+            $this->command->info('Downloading the recipes JSON file from S3...');
 
-            if ($response->ok()) {
-                file_put_contents($filePath, $response->body());
-                $this->command->info('File downloaded and saved locally.');
-            } else {
-                $this->command->error('Failed to download the file from Google Drive.');
+            try {
+                $response = Http::timeout(300) // Set the timeout to 300 seconds (5 minutes)
+                ->withoutVerifying()
+                    ->get($s3Url);
+
+                if ($response->ok()) {
+                    file_put_contents($localFilePath, $response->body());
+                    $this->command->info('File downloaded and saved locally.');
+                } else {
+                    $this->command->error('Failed to download the file from S3. Please check the URL or permissions.');
+                    return;
+                }
+            } catch (\Exception $e) {
+                $this->command->error('Error while downloading: ' . $e->getMessage());
                 return;
             }
         }
 
-        if (!file_exists($filePath) || !is_readable($filePath)) {
+        if (!file_exists($localFilePath) || !is_readable($localFilePath)) {
             $this->command->error('File does not exist or is not readable.');
             return;
         }
@@ -47,7 +55,7 @@ class RecipeSeeder extends Seeder
         Recipe::query()->delete();
         $this->command->info('Starting to import recipes...');
 
-        $jsonStream = Items::fromFile($filePath);
+        $jsonStream = Items::fromFile($localFilePath);
         $batchSize = 100;
         $recipes = [];
         $recipeCount = 0;
