@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/recipeze')->group(function() {
 
+    //dummy
     Route::get('/list', [RecipeController::class, 'index'])->name('api.v1.recipes.index');
 
     // Authentication guest routes
@@ -20,8 +21,7 @@ Route::prefix('v1/recipeze')->group(function() {
         Route::prefix('kitchen')->group(function() {
             Route::get('/', [KitchenController::class, 'index'])->name('api.v1.kitchen.index');
             Route::post('/ingredient/toggle/{id}', [KitchenController::class, 'toggleIngredientAvailability'])->name('api.v1.kitchen.ingredient.toggle');
-            Route::post('/ingredient/add', [KitchenController::class, 'addIngredient'])->name('api.v1.kitchen.ingredient.add');
-            Route::post('/category/add', [KitchenController::class, 'addCategory'])->name('api.v1.kitchen.category.add');
+            Route::post('/ingredient/add', [KitchenController::class, 'add'])->name('api.v1.kitchen.ingredient.add');
         });
 
         // Profile routes
