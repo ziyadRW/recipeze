@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Http;
 
 class RecipeController extends Controller
 {
+
+    //dummy
     public function index(Request $request){
         $savedRecipes = Recipe::paginate(10);
         if ($request->is('api/*')) {
@@ -41,6 +43,15 @@ class RecipeController extends Controller
         }
         $recipes = $query->paginate($perPage);
 
+        if($request->is('api/*')){
+            return response()->json([
+                'paginatedRecipes' => $recipes,
+                'searchTerm' => $searchTerm,
+                'hasVideo' => $hasVideo,
+                'savedRecipeIds' => $savedRecipeIds,
+            ]);
+        }
+
         return view('recipes.list', [
             'paginatedRecipes' => $recipes,
             'searchTerm' => $searchTerm,
@@ -48,7 +59,6 @@ class RecipeController extends Controller
             'savedRecipeIds' => $savedRecipeIds,
         ]);
     }
-
 
 
     public function generatedRecipes(Request $request)
@@ -82,43 +92,76 @@ class RecipeController extends Controller
         );
         $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
 
+        if($request->is('api/*')){
+            return response()->json([
+                'paginatedRecipes' => $paginatedRecipes,
+                'savedRecipeIds' => $savedRecipeIds,
+            ]);
+        }
+
         return view('recipes.generated', [
             'paginatedRecipes' => $paginatedRecipes,
             'savedRecipeIds' => $savedRecipeIds,
         ]);
     }
 
-    public function showRecipe($id)
+    public function showRecipe($id, Request $request)
     {
         $recipe = Recipe::with('ingredients')->findOrFail($id);
         $user = auth()->user();
         $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
+
+        if($request->is('api/*')){
+            return response()->json([
+                'recipe' => $recipe,
+                'savedRecipeIds' => $savedRecipeIds
+            ]);
+        }
+
         return view('recipes.show', [
             'recipe' => $recipe,
             'savedRecipeIds' => $savedRecipeIds
         ]);
     }
 
-    public function toggleBookmarkRecipe($id)
+    public function toggleBookmarkRecipe($id, Request $request)
     {
         $recipe = Recipe::findOrFail($id);
         $user = auth()->user();
 
         if ($user->savedRecipes()->where('recipe_id', $id)->exists()) {
             $user->savedRecipes()->detach($id);
+            if($request->is('api/*')){
+                return response()->json([
+                    'toaster' => 'infoToaster',
+                    'message' => 'Recipe removed from saved recipes'
+                    ]);
+            }
             return back()->with('infoToaster','Recipe removed from saved recipes');
         } else {
             $user->savedRecipes()->attach($id);
+            if($request->is('api/*')){
+                return response()->json([
+                    'toaster' => 'successToaster',
+                    'message' => 'Recipe saved successfully'
+                ]);
+            }
             return back()->with('successToaster', 'Recipe saved successfully');
         }
-        return back()->with('errorToaster', 'Failed to bookmark Recipe');
     }
 
-    public function listSavedRecipes()
+    public function listSavedRecipes(Request $request)
     {
         $user = auth()->user();
         $savedRecipes = $user->savedRecipes()->paginate(10);
         $savedRecipeIds = $user->savedRecipes->pluck('id')->toArray();
+
+        if($request->is('api/*')){
+            return response()->json([
+                'savedRecipes' => $savedRecipes,
+                'savedRecipeIds' => $savedRecipeIds
+            ]);
+        }
 
         return view('recipes.saved', [
             'savedRecipes' => $savedRecipes,
