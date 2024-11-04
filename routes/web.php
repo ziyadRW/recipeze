@@ -7,7 +7,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SavedRecipeController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('recipeze')->group(function() {
+Route::prefix('/')->group(function() {
 
     // Home page
     Route::get('/list', [RecipeController::class, 'index'])->name('recipes.index');
