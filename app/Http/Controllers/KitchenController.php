@@ -61,25 +61,32 @@ class KitchenController extends Controller
         if ($searchTerm) {
             $ingredientsQuery->where('name', 'like', '%' . $searchTerm . '%');
         }
-        $ingredients = $ingredientsQuery
+
+        $paginatedIngredients = $ingredientsQuery
+            ->selectRaw('MIN(id) as id, name')
+            ->groupBy('name')
+            ->orderBy('name', 'asc')
+            ->paginate(50);
+
+        $ingredients = Ingredient::query()
             ->selectRaw('MIN(id) as id, name')
             ->groupBy('name')
             ->orderBy('name', 'asc')
             ->get();
+
         $savedIngredientIds = $user->ingredients->pluck('id')->toArray();
 
         if ($request->is('api/*')) {
             return response()->json([
                 'message' => 'list ingredients',
-                'ingredients' => $ingredients,
-                'savedIngredientIds' => $savedIngredientIds
+                'ingredients' => $paginatedIngredients,
+                'savedIngredientIds' => $savedIngredientIds,
             ]);
         }
 
         return view('kitchen.add', [
             'ingredients' => $ingredients,
-            'savedIngredientIds' => $savedIngredientIds
+            'savedIngredientIds' => $savedIngredientIds,
         ]);
     }
-
 }
