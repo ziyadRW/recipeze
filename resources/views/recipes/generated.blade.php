@@ -58,6 +58,11 @@
 
                             </div>
                         </div>
+
+{{--                        <!-- Display missing ingredients if any -->--}}
+{{--                        @if(!$recipe->full_ingredients && count($recipe->missing_ingredients) > 0)--}}
+{{--                            <p class="text-sm text-red-500 mt-2">Missing: {{ implode(', ', $recipe->missing_ingredients) }}</p>--}}
+{{--                        @endif--}}
                     </a>
                 @endforeach
             </div>

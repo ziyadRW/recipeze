@@ -52,7 +52,7 @@ class KitchenController extends Controller
         return back()->with('errorToaster', 'Failed to bookmark Recipe');
     }
 
-    public function add(Request $request)
+    public function paginatedAdd(Request $request)
     {
         $user = auth()->user();
         $searchTerm = $request->input('search');
@@ -78,7 +78,7 @@ class KitchenController extends Controller
 
         if ($request->is('api/*')) {
             return response()->json([
-                'message' => 'list ingredients',
+                'message' => 'list paginated ingredients',
                 'ingredients' => $paginatedIngredients,
                 'savedIngredientIds' => $savedIngredientIds,
             ]);
@@ -89,4 +89,35 @@ class KitchenController extends Controller
             'savedIngredientIds' => $savedIngredientIds,
         ]);
     }
+
+    public function AllAdd(Request $request)
+    {
+        $user = auth()->user();
+        $searchTerm = $request->input('search');
+        $ingredientsQuery = Ingredient::query();
+
+        if ($searchTerm) {
+            $ingredientsQuery->where('name', 'like', '%' . $searchTerm . '%');
+        }
+        $ingredients = $ingredientsQuery
+            ->selectRaw('MIN(id) as id, name')
+            ->groupBy('name')
+            ->orderBy('name', 'asc')
+            ->get();
+        $savedIngredientIds = $user->ingredients->pluck('id')->toArray();
+
+        if ($request->is('api/*')) {
+            return response()->json([
+                'message' => 'list all ingredients',
+                'ingredients' => $ingredients,
+                'savedIngredientIds' => $savedIngredientIds
+            ]);
+        }
+
+        return view('kitchen.add', [
+            'ingredients' => $ingredients,
+            'savedIngredientIds' => $savedIngredientIds
+        ]);
+    }
+
 }
